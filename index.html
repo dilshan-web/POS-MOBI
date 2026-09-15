@@ -1338,37 +1338,7 @@ button:active, .btn-touch:active {
        BOTTOM FIXED MOBILE NAVIGATION BAR (6 Primary Tabs with Top 10)
        ========================================================================= -->
   <nav id="app-bottom-nav" class="hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur border-t border-slate-100 bottom-nav-safe shadow-2xl shadow-slate-900/10">
-    <div id="bottom-nav-inner" class="max-w-lg mx-auto grid grid-cols-6 py-1.5 px-1">
-      <button onclick="UI.switchTab('dashboard')" data-tab="dashboard" class="nav-tab-btn flex flex-col items-center justify-center py-1 text-emerald-600 font-black text-[10px]">
-        <div class="nav-icon-wrap w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white flex items-center justify-center text-sm shadow-md shadow-violet-500/30">📊</div>
-        <span class="mt-0.5 truncate">Home</span>
-      </button>
-
-      <button onclick="UI.switchTab('pos')" data-tab="pos" class="nav-tab-btn flex flex-col items-center justify-center py-1 text-slate-500 text-[10px]">
-        <div class="nav-icon-wrap w-8 h-8 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 text-white flex items-center justify-center text-sm shadow-md shadow-orange-400/30">🛒</div>
-        <span class="mt-0.5 truncate">Sale</span>
-      </button>
-
-      <button onclick="UI.switchTab('production')" data-tab="production" class="nav-tab-btn flex flex-col items-center justify-center py-1 text-slate-500 text-[10px]">
-        <div class="nav-icon-wrap w-8 h-8 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 text-white flex items-center justify-center text-sm shadow-md shadow-sky-400/30">📦</div>
-        <span class="mt-0.5 truncate">Orders</span>
-      </button>
-
-      <button onclick="UI.switchTab('best-shops')" data-tab="best-shops" class="nav-tab-btn flex flex-col items-center justify-center py-1 text-slate-500 text-[10px]">
-        <div class="nav-icon-wrap w-8 h-8 rounded-xl bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500 text-white flex items-center justify-center text-sm shadow-md shadow-amber-400/40">🏆</div>
-        <span class="mt-0.5 truncate font-extrabold text-amber-700">Top 10</span>
-      </button>
-
-      <button onclick="UI.switchTab('collections')" data-tab="collections" class="nav-tab-btn flex flex-col items-center justify-center py-1 text-slate-500 text-[10px]">
-        <div class="nav-icon-wrap w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 text-white flex items-center justify-center text-sm shadow-md shadow-emerald-400/30">💵</div>
-        <span class="mt-0.5 truncate">Collect</span>
-      </button>
-
-      <button onclick="UI.openModal('modal-more-menu')" class="flex flex-col items-center justify-center py-1 text-slate-500 text-[10px]">
-        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-slate-500 to-slate-700 text-white flex items-center justify-center text-sm shadow-md">☰</div>
-        <span class="mt-0.5 truncate">More</span>
-      </button>
-    </div>
+    <div id="bottom-nav-inner" class="max-w-lg mx-auto"></div>
   </nav>
 
 
@@ -12350,8 +12320,8 @@ async function initDatabaseDefaults() {
         receiptFooter: 'Thank you for your business! / ස්තූතියි!',
         pin: '1234',
         printerWidth: '58mm',
-        supabaseUrl: '',
-        supabaseKey: '',
+        supabaseUrl: 'https://qetyvorqsgjetgmdrexz.supabase.co',
+        supabaseKey: 'sb_publishable_nz9g4xezWuOCO6tq0gr_Sg_Ihkk-LqI',
         lastSyncAt: null
       });
     }
@@ -12658,17 +12628,21 @@ const CloudSync = {
   isSyncing: false,
   syncInterval: null,
   lastSyncTime: null,
-  status: 'offline_active', // 'offline_active', 'synced', 'syncing', 'error'
-  enabled: false, // Cloud sync disabled by user preference - 100% offline-first local database
+  status: 'disconnected',
+
+  // Supabase credentials (hardcoded defaults - auto-connect on first run)
+  DEFAULT_URL: 'https://qetyvorqsgjetgmdrexz.supabase.co',
+  DEFAULT_KEY: 'sb_publishable_nz9g4xezWuOCO6tq0gr_Sg_Ihkk-LqI',
 
   async getConfig() {
     try {
       const company = await db.company.toCollection().first();
-      let url = company?.supabaseUrl || localStorage.getItem('spice_pos_supabase_url') || '';
-      let key = company?.supabaseKey || localStorage.getItem('spice_pos_supabase_key') || '';
-      return { url: (url || '').trim(), key: (key || '').trim() };
+      let url = company?.supabaseUrl || localStorage.getItem('spice_pos_supabase_url') || this.DEFAULT_URL;
+      let key = company?.supabaseKey || localStorage.getItem('spice_pos_supabase_key') || this.DEFAULT_KEY;
+      url = (url || this.DEFAULT_URL).trim().replace(/\/$/, '').replace(/\/rest\/v1\/?$/, '');
+      return { url, key: (key || this.DEFAULT_KEY).trim() };
     } catch {
-      return { url: '', key: '' };
+      return { url: this.DEFAULT_URL, key: this.DEFAULT_KEY };
     }
   },
 
@@ -12685,32 +12659,44 @@ const CloudSync = {
         supabaseKey: cleanKey
       });
     }
-    this.enabled = Boolean(cleanUrl && cleanKey);
     this.updateStatusBadge();
-    if (this.enabled) {
+    if (cleanUrl && cleanKey) {
       this.syncNow(true);
     }
   },
 
   async isConfigured() {
     const { url, key } = await this.getConfig();
-    return Boolean(url && key && this.enabled);
+    return Boolean(url && key);
   },
 
   init() {
     this.updateStatusBadge();
-    
-    // Only setup auto-sync if explicitly configured and enabled
-    if (this.enabled) {
-      window.addEventListener('online', () => {
-        this.updateStatusBadge();
-        this.syncNow();
-      });
 
-      window.addEventListener('offline', () => {
-        this.updateStatusBadge();
-      });
-    }
+    // Auto-sync on network reconnect
+    window.addEventListener('online', () => {
+      this.updateStatusBadge();
+      this.syncNow(false);
+    });
+
+    window.addEventListener('offline', () => {
+      this.updateStatusBadge();
+    });
+
+    // Periodic background sync every 60 seconds (silent - no error popups)
+    if (this.syncInterval) clearInterval(this.syncInterval);
+    this.syncInterval = setInterval(() => {
+      if (navigator.onLine && !this.isSyncing) {
+        this.syncNow(false);
+      }
+    }, 60000);
+
+    // Initial sync after 3 seconds (silent)
+    setTimeout(() => {
+      if (navigator.onLine && !this.isSyncing) {
+        this.syncNow(false);
+      }
+    }, 3000);
   },
 
   async apiRequest(endpoint, method = 'GET', body = null, headers = {}) {
