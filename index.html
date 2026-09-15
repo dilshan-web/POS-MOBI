@@ -317,13 +317,16 @@ button:active, .btn-touch:active {
   background: linear-gradient(145deg, #1e293b, #0f172a);
   color: #ffffff;
   box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.08);
-  transition: all 0.15s ease;
   user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.05s ease, background 0.05s ease;
 }
 .keypad-btn:active {
-  background: linear-gradient(145deg, #334155, #1e293b);
-  transform: scale(0.9);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  background: #334155;
+  transform: scale(0.92);
 }
 
 /* ── QR Scanner Modal ───────────────────────────────── */
@@ -636,24 +639,22 @@ button:active, .btn-touch:active {
           </button>
         </div>
 
-        <div class="grid grid-cols-4 gap-2 pt-2.5 text-center">
-          <div class="bg-slate-800/80 p-2 rounded-2xl border border-slate-700">
-            <span class="text-[9px] uppercase font-bold text-slate-400 block">Day Sales</span>
-            <div id="pos-rep-today-sales" class="text-xs sm:text-sm font-black text-emerald-400 mt-0.5 truncate">Rs. 0.00</div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2.5 text-center">
+          <div class="bg-slate-800/80 p-2.5 rounded-2xl border border-slate-700 flex flex-col justify-center">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Day Sales (අද මුදල)</span>
+            <div id="pos-rep-today-sales" class="text-sm sm:text-base font-black text-emerald-400 mt-0.5 whitespace-nowrap">Rs. 0.00</div>
           </div>
-          <div class="bg-slate-800/80 p-2 rounded-2xl border border-slate-700">
-            <span class="text-[9px] uppercase font-bold text-slate-400 block">Day Bills</span>
-            <div id="pos-rep-today-bills" class="text-xs sm:text-sm font-black text-white mt-0.5">0 Bills</div>
+          <div class="bg-slate-800/80 p-2.5 rounded-2xl border border-slate-700 flex flex-col justify-center">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Day Bills (බිල්පත්)</span>
+            <div id="pos-rep-today-bills" class="text-sm sm:text-base font-black text-white mt-0.5">0 Bills</div>
           </div>
-          <div class="bg-emerald-950/60 p-2 rounded-2xl border border-emerald-700/50">
-            <span class="text-[9px] uppercase font-bold text-emerald-300 block">Cards Gone</span>
-            <div id="pos-rep-today-cards" class="text-sm sm:text-base font-black text-emerald-300 mt-0.5">0</div>
-            <span class="text-[8px] text-emerald-400 font-semibold">කාඩ් ගණන</span>
+          <div class="bg-emerald-950/60 p-2.5 rounded-2xl border border-emerald-700/50 flex flex-col justify-center">
+            <span class="text-[10px] uppercase font-bold text-emerald-300 block">Cards Sold (කාඩ් ගණන)</span>
+            <div id="pos-rep-today-cards" class="text-sm sm:text-base font-black text-emerald-300 mt-0.5">0 Cards</div>
           </div>
-          <div class="bg-red-950/60 p-2 rounded-2xl border border-red-700/50">
-            <span class="text-[9px] uppercase font-bold text-red-300 block">Day Returns</span>
-            <div id="pos-rep-today-returns" class="text-sm sm:text-base font-black text-red-300 mt-0.5">0</div>
-            <span class="text-[8px] text-red-400 font-semibold">ආපසු/මාරු</span>
+          <div class="bg-red-950/60 p-2.5 rounded-2xl border border-red-700/50 flex flex-col justify-center">
+            <span class="text-[10px] uppercase font-bold text-red-300 block">Day Returns (ආපසු/මාරු)</span>
+            <div id="pos-rep-today-returns" class="text-sm sm:text-base font-black text-red-300 mt-0.5">0 Items</div>
           </div>
         </div>
       </div>
@@ -723,14 +724,19 @@ button:active, .btn-touch:active {
           </div>
         </div>
 
-        <!-- Selected Shop Details Card -->
-        <div id="pos-shop-details-card" class="hidden bg-emerald-50 border border-emerald-200 p-3 rounded-2xl flex items-center justify-between">
-          <div class="min-w-0">
+        <!-- Selected Shop Details Card with History Button -->
+        <div id="pos-shop-details-card" class="hidden bg-emerald-50 border border-emerald-200 p-3 rounded-2xl flex items-center justify-between gap-2 flex-wrap">
+          <div class="min-w-0 flex-1">
             <h4 id="pos-selected-shop-name" class="font-bold text-xs sm:text-sm text-slate-900 truncate">-</h4>
             <div id="pos-selected-shop-phone" class="text-xs text-slate-600 mt-0.5 truncate">-</div>
           </div>
-          <div id="pos-selected-shop-credit" class="text-xs font-black px-2.5 py-1 rounded-xl bg-red-100 text-red-800 flex-shrink-0">
-            Old Credit: Rs. 0
+          <div class="flex items-center gap-1.5 flex-shrink-0">
+            <button type="button" onclick="Shops.viewShopHistory(POS.activeShopId)" class="px-2.5 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 active:scale-95 text-white font-black text-xs rounded-xl shadow-md shadow-indigo-500/30 flex items-center gap-1" title="View past invoices, purchased products & return history">
+              <span>📜 History</span>
+            </button>
+            <div id="pos-selected-shop-credit" class="text-xs font-black px-2.5 py-1 rounded-xl bg-red-100 text-red-800">
+              Old Credit: Rs. 0
+            </div>
           </div>
         </div>
       </div>
@@ -1779,6 +1785,63 @@ button:active, .btn-touch:active {
       <button onclick="Collections.submitCollection()" class="w-full bg-green-600 text-white text-xs font-black py-3 rounded-2xl shadow-lg shadow-green-600/30 hover:bg-green-700 active:scale-95">
         Save & Record Payment 💵
       </button>
+    </div>
+  </div>
+
+
+  <!-- =========================================================================
+       MODAL: SHOP PURCHASE & TRANSACTION HISTORY (ගනුදෙනු & බිල්පත් ඉතිහාසය)
+       ========================================================================= -->
+  <div id="modal-shop-history" class="modal-overlay hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div class="modal-content bg-white w-full max-w-lg rounded-3xl p-4 sm:p-5 space-y-3.5 max-h-[90vh] flex flex-col shadow-2xl">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-lg shadow-md shadow-indigo-500/20">
+            📜
+          </div>
+          <div>
+            <h3 id="hist-modal-shop-name" class="font-black text-sm sm:text-base text-slate-900 leading-tight">Shop History</h3>
+            <p id="hist-modal-shop-sub" class="text-[11px] text-slate-500">All past orders, bills & returns</p>
+          </div>
+        </div>
+        <button onclick="UI.closeModal('modal-shop-history')" class="p-1.5 text-slate-400 hover:text-slate-600 text-lg rounded-xl hover:bg-slate-100">✕</button>
+      </div>
+
+      <!-- Shop Summary Banner -->
+      <div class="grid grid-cols-3 gap-2 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-3 rounded-2xl border border-slate-700 text-center">
+        <div class="bg-slate-800/80 p-2 rounded-xl border border-slate-700/60">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block">Total Bills</span>
+          <div id="hist-modal-total-bills" class="text-xs sm:text-sm font-black text-white mt-0.5">0</div>
+        </div>
+        <div class="bg-slate-800/80 p-2 rounded-xl border border-slate-700/60">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block">Total Purchased</span>
+          <div id="hist-modal-total-spent" class="text-xs sm:text-sm font-black text-emerald-400 mt-0.5">Rs. 0</div>
+        </div>
+        <div class="bg-slate-800/80 p-2 rounded-xl border border-slate-700/60">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block">Current Credit</span>
+          <div id="hist-modal-current-credit" class="text-xs sm:text-sm font-black text-red-400 mt-0.5">Rs. 0</div>
+        </div>
+      </div>
+
+      <!-- Search inside history -->
+      <div class="relative">
+        <input type="text" id="hist-search-input" oninput="Shops.filterHistoryList(this.value)" placeholder="🔍 Search product name, invoice #, date..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-3 pr-8 py-2 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none" />
+        <button onclick="document.getElementById('hist-search-input').value=''; Shops.filterHistoryList('')" class="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 text-xs font-bold">✕</button>
+      </div>
+
+      <!-- Chronological History List Container -->
+      <div id="hist-modal-list-container" class="space-y-2.5 overflow-y-auto flex-1 pr-1 max-h-[50vh]">
+        <!-- Populated dynamically by shops.js -->
+      </div>
+
+      <!-- Footer Action -->
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+        <span class="text-[10px] text-slate-400">Past transactions stored in local database</span>
+        <button onclick="UI.closeModal('modal-shop-history')" class="px-4 py-2 bg-slate-900 text-white font-bold text-xs rounded-xl hover:bg-slate-800 active:scale-95">
+          Close
+        </button>
+      </div>
     </div>
   </div>
 
@@ -13194,7 +13257,26 @@ const Auth = {
   currentUser: null, // { id, username, fullName, role: 'admin' | 'rep', assignedRouteId }
 
   async init() {
+    this.bindKeyboardEvents();
     await this.checkInitialLock();
+  },
+
+  bindKeyboardEvents() {
+    window.addEventListener('keydown', (e) => {
+      if (!this.isLocked) return;
+      
+      // Numbers 0-9
+      if (/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+        this.handleKeypadPress(parseInt(e.key, 10));
+      } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        this.handleKeypadDelete();
+      } else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') {
+        e.preventDefault();
+        this.handleKeypadClear();
+      }
+    });
   },
 
   async checkInitialLock() {
@@ -13671,7 +13753,7 @@ const UI = {
       const dateEl = document.getElementById('header-live-date');
 
       if (timeEl) {
-        timeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        timeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
       }
       if (dateEl) {
         dateEl.textContent = now.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
@@ -15129,8 +15211,12 @@ const POS = {
     UI.showToast(isBooking ? `Order #${invoiceNo} booked for delivery on ${UI.formatDate(deliveryDate)}!` : `Invoice #${invoiceNo} saved & billed!`, 'success');
 
     // 5. Trigger Print if instant sale
-    if (!isBooking && autoPrint) {
-      await Print.printInvoice(saleId);
+    if (!isBooking) {
+      if (autoPrint) {
+        await Print.printInvoice(saleId);
+      } else {
+        await Print.previewInvoice(saleId);
+      }
     }
 
     // 6. Reset POS
@@ -16055,66 +16141,226 @@ const Shops = {
     Dashboard.loadDashboard();
   },
 
-  // View Shop History
+  // View Comprehensive Shop Transaction & Order History
+  _cachedHistoryEvents: [],
+
   async viewShopHistory(shopId) {
-    const shop = await db.shops.get(shopId);
+    if (!shopId) return;
+    const shop = await db.shops.get(Number(shopId));
     if (!shop) return;
 
-    const sales = await db.sales.where('shopId').equals(shopId).reverse().toArray();
-    const payments = await db.creditPayments.where('shopId').equals(shopId).reverse().toArray();
+    const route = shop.routeId ? await db.routes.get(shop.routeId) : null;
+    const sales = await db.sales.where('shopId').equals(shop.id).reverse().toArray();
+    const payments = await db.creditPayments ? await db.creditPayments.where('shopId').equals(shop.id).reverse().toArray() : [];
 
-    document.getElementById('history-modal-shop-name').textContent = shop.name;
-    document.getElementById('history-modal-credit-badge').textContent = `Current Credit: ${UI.formatCurrency(shop.currentCredit)}`;
+    // Header Details
+    const nameEl = document.getElementById('hist-modal-shop-name');
+    const subEl = document.getElementById('hist-modal-shop-sub');
+    if (nameEl) nameEl.textContent = shop.name;
+    if (subEl) subEl.textContent = `${shop.ownerName || 'Owner'} • ${shop.phone || 'No phone'} • 🗺️ ${route ? route.name : 'Unassigned'}`;
 
-    const listContainer = document.getElementById('history-modal-timeline');
+    const totalBills = sales.length;
+    const totalSpent = sales.filter(s => s.status !== 'Cancelled').reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0);
+    const currentCredit = Number(shop.currentCredit) || 0;
+
+    const totalBillsEl = document.getElementById('hist-modal-total-bills');
+    const totalSpentEl = document.getElementById('hist-modal-total-spent');
+    const currentCreditEl = document.getElementById('hist-modal-current-credit');
+
+    if (totalBillsEl) totalBillsEl.textContent = `${totalBills} Bills`;
+    if (totalSpentEl) totalSpentEl.textContent = UI.formatCurrency(totalSpent);
+    if (currentCreditEl) currentCreditEl.textContent = UI.formatCurrency(currentCredit);
+
+    // Combine & Sort Events
+    const events = [];
+
+    for (const sale of sales) {
+      const items = await db.saleItems.where('saleId').equals(sale.id).toArray();
+      const returns = db.salesReturns ? await db.salesReturns.where('saleId').equals(sale.id).toArray() : [];
+      events.push({
+        type: 'sale',
+        id: sale.id,
+        invoiceNo: sale.invoiceNo,
+        date: sale.date,
+        deliveryDate: sale.deliveryDate,
+        totalAmount: sale.totalAmount,
+        paidAmount: sale.paidAmount,
+        creditAmount: sale.creditAmount,
+        paymentType: sale.paymentType,
+        status: sale.status,
+        repName: sale.repName || 'Admin',
+        orderType: sale.orderType || (sale.deliveryDate ? 'BookTomorrow' : 'DirectSale'),
+        items: items,
+        returns: returns,
+        note: sale.note || ''
+      });
+    }
+
+    for (const pay of payments) {
+      events.push({
+        type: 'payment',
+        id: pay.id,
+        date: pay.date,
+        amountPaid: pay.amountPaid,
+        previousCredit: pay.previousCredit,
+        newCredit: pay.newCredit,
+        note: pay.note || 'Debt payment collection'
+      });
+    }
+
+    events.sort((a, b) => new Date(b.date) - new Date(a.date));
+    this._cachedHistoryEvents = events;
+
+    this.renderHistoryList(events, shop.id);
+    UI.openModal('modal-shop-history');
+  },
+
+  renderHistoryList(events, shopId) {
+    const listContainer = document.getElementById('hist-modal-list-container');
     if (!listContainer) return;
 
-    let html = '';
-    if (sales.length === 0 && payments.length === 0) {
-      html = `<div class="text-center py-6 text-gray-400 text-xs">No transactions recorded for this shop yet.</div>`;
-    } else {
-      const events = [
-        ...sales.map(s => ({ type: 'sale', date: s.date, data: s })),
-        ...payments.map(p => ({ type: 'payment', date: p.date, data: p }))
-      ].sort((a, b) => new Date(b.date) - new Date(a.date));
+    if (!events || events.length === 0) {
+      listContainer.innerHTML = `
+        <div class="text-center py-8 text-slate-400 bg-slate-50 rounded-2xl border border-slate-100 p-4">
+          <div class="text-3xl mb-1">📜</div>
+          <p class="text-xs font-bold">No past orders or payments recorded yet.</p>
+          <p class="text-[10px] text-slate-400 mt-0.5">Orders and bill history will appear here automatically.</p>
+        </div>
+      `;
+      return;
+    }
 
-      for (const ev of events) {
-        if (ev.type === 'sale') {
-          html += `
-            <div class="p-3 bg-white rounded-xl border border-gray-100 shadow-xs flex items-center justify-between">
-              <div>
-                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">INVOICE #${ev.data.invoiceNo}</span>
-                <p class="text-xs text-gray-500 mt-1">${UI.formatDateTime(ev.date)} • <span class="font-semibold">${ev.data.paymentType}</span></p>
-                <p class="text-[10px] text-gray-400">${ev.data.status || 'Delivered'}</p>
-              </div>
-              <div class="text-right flex flex-col items-end gap-1">
-                <div class="font-bold text-xs text-gray-900">${UI.formatCurrency(ev.data.totalAmount)}</div>
-                <div class="flex gap-1">
-                  <button onclick="Print.printExistingInvoice(${ev.data.id})" class="text-xs text-orange-600 hover:underline">🖨️ Print</button>
-                  <button onclick="Shops.confirmDeleteSale(${ev.data.id}, ${shopId})" class="text-xs text-red-500 hover:underline">🗑️ Del</button>
-                </div>
-              </div>
-            </div>
-          `;
-        } else {
-          html += `
-            <div class="p-3 bg-green-50 rounded-xl border border-green-100 flex items-center justify-between">
-              <div>
-                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-200 text-green-800">💵 DEBT PAYMENT</span>
-                <p class="text-xs text-gray-600 mt-1">${UI.formatDateTime(ev.date)}</p>
-                <p class="text-[10px] text-gray-500">Balance: ${UI.formatCurrency(ev.data.previousCredit)} ➔ ${UI.formatCurrency(ev.data.newCredit)}</p>
-              </div>
-              <div class="text-right">
-                <div class="font-bold text-xs text-green-700">+${UI.formatCurrency(ev.data.amountPaid)}</div>
+    let html = '';
+    for (const ev of events) {
+      if (ev.type === 'sale') {
+        const isCancelled = ev.status === 'Cancelled';
+        const isBooking = ev.orderType === 'BookTomorrow' || ev.status === 'Pending';
+
+        let itemsHtml = '';
+        if (ev.items && ev.items.length > 0) {
+          itemsHtml = `
+            <div class="mt-2 pt-2 border-t border-slate-100 space-y-1">
+              <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider block">📦 Items Purchased (ගනුදෙනු කල භාණ්ඩ):</span>
+              <div class="bg-slate-50 rounded-xl p-2 space-y-1">
+                ${ev.items.map(it => `
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-slate-800">
+                      • ${it.productName} <span class="text-slate-500 font-semibold">(${it.qty} ${it.unit})</span>
+                    </span>
+                    <span class="font-bold text-slate-700">
+                      Rs. ${(Number(it.sellingPrice) * Number(it.qty)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                `).join('')}
               </div>
             </div>
           `;
         }
+
+        let returnsHtml = '';
+        if (ev.returns && ev.returns.length > 0) {
+          returnsHtml = `
+            <div class="mt-1.5 bg-red-50/70 border border-red-200/60 rounded-xl p-2 space-y-1">
+              <span class="text-[10px] font-black text-red-700 uppercase tracking-wider block">🔄 Returns / Replacements (ආපසු/මාරු):</span>
+              ${ev.returns.map(r => `
+                <div class="flex items-center justify-between text-[11px] text-red-800 font-bold">
+                  <span>${r.action === 'deduct' ? '• [Deducted]' : '• [Exchange]'} ${r.productName} (${r.qty} ${r.returnType})</span>
+                  <span>${r.action === 'deduct' ? '-' + UI.formatCurrency(r.refundAmount) : '✓ Replaced'}</span>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        html += `
+          <div class="bg-white rounded-2xl border ${isCancelled ? 'border-red-200 bg-red-50/30' : 'border-slate-200'} p-3.5 shadow-sm space-y-2 hover:border-indigo-300 transition-all">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="px-2 py-0.5 rounded-lg text-[10px] font-black ${isBooking ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'}">
+                    ${isBooking ? '📦 DELIVERY BOOKING' : '⚡ DIRECT SALE'}
+                  </span>
+                  <span class="text-xs font-black text-slate-900">#${ev.invoiceNo}</span>
+                  <span class="text-[10px] font-semibold text-slate-500">by ${ev.repName}</span>
+                </div>
+                <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-1 font-medium">
+                  <span>📅 ${UI.formatDateTime(ev.date)}</span>
+                  ${ev.deliveryDate ? `<span>• Del: ${UI.formatDate(ev.deliveryDate)}</span>` : ''}
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-sm font-black text-slate-900">${UI.formatCurrency(ev.totalAmount)}</div>
+                <span class="inline-block text-[10px] font-black px-2 py-0.5 rounded-full ${
+                  ev.paymentType === 'Cash' ? 'bg-emerald-100 text-emerald-800' :
+                  ev.paymentType === 'Credit' ? 'bg-red-100 text-red-800' :
+                  'bg-amber-100 text-amber-800'
+                }">
+                  ${ev.paymentType || 'Cash'}
+                </span>
+              </div>
+            </div>
+
+            ${itemsHtml}
+            ${returnsHtml}
+
+            <!-- Bill Footer Actions -->
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span class="text-[10px] text-slate-400">Paid: ${UI.formatCurrency(ev.paidAmount || 0)} | Credit: ${UI.formatCurrency(ev.creditAmount || 0)}</span>
+              <div class="flex items-center gap-2">
+                <button onclick="Print.printExistingInvoice(${ev.id})" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl active:scale-95 flex items-center gap-1">
+                  <span>🖨️ Print</span>
+                </button>
+                <button onclick="Shops.confirmDeleteSale(${ev.id}, ${shopId})" class="p-1 text-red-400 hover:text-red-600 rounded-lg" title="Delete Invoice">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (ev.type === 'payment') {
+        html += `
+          <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200/80 shadow-xs flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-[10px] font-black px-2 py-0.5 rounded-lg bg-emerald-200 text-emerald-900">💵 DEBT PAYMENT</span>
+                <span class="text-xs text-emerald-800 font-bold">${UI.formatDateTime(ev.date)}</span>
+              </div>
+              <p class="text-[11px] text-emerald-700 mt-1">${ev.note}</p>
+              <p class="text-[10px] text-slate-500 mt-0.5">Credit: ${UI.formatCurrency(ev.previousCredit)} ➔ ${UI.formatCurrency(ev.newCredit)}</p>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-black text-emerald-800">+${UI.formatCurrency(ev.amountPaid)}</div>
+            </div>
+          </div>
+        `;
       }
     }
 
     listContainer.innerHTML = html;
-    UI.openModal('modal-shop-history');
+  },
+
+  filterHistoryList(searchTerm) {
+    if (!this._cachedHistoryEvents) return;
+    if (!searchTerm || !searchTerm.trim()) {
+      this.renderHistoryList(this._cachedHistoryEvents);
+      return;
+    }
+    const t = searchTerm.toLowerCase().trim();
+    const filtered = this._cachedHistoryEvents.filter(ev => {
+      if (ev.type === 'sale') {
+        const matchInv = String(ev.invoiceNo || '').toLowerCase().includes(t);
+        const matchRep = String(ev.repName || '').toLowerCase().includes(t);
+        const matchDate = String(ev.date || '').toLowerCase().includes(t);
+        const matchItems = (ev.items || []).some(it => String(it.productName || '').toLowerCase().includes(t));
+        const matchReturns = (ev.returns || []).some(r => String(r.productName || '').toLowerCase().includes(t));
+        return matchInv || matchRep || matchDate || matchItems || matchReturns;
+      } else {
+        const matchNote = String(ev.note || '').toLowerCase().includes(t);
+        const matchDate = String(ev.date || '').toLowerCase().includes(t);
+        return matchNote || matchDate;
+      }
+    });
+    this.renderHistoryList(filtered);
   },
 
   // Confirm delete a single sale from history
